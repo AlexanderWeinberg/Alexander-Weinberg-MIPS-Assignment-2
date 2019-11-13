@@ -116,9 +116,13 @@ li $v0, 10    #exits the program
 syscall
 
 #subroutine area
-mov eax, 5
-mov ebx, 3
-call sum
-nop
-j next
+jal subprogram
+jr $ra
+
+subprogram:
+
+addi $sp, $sp, -4  #$sp is a stack pointer and -4 makes room in the stack to save nformation in
+jr $ra
+
+
 
