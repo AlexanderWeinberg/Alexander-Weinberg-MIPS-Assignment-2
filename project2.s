@@ -16,7 +16,7 @@ la $s3, 0     #register to keep track of spaces
 
 li $v0,8 	      # takes in and reads input
 la $a0, user_input    #puts the users input into the $a0 register
-li $a1, 5            #takes in 4 spaces from the user input even though it says 5 (NULL)
+li $a1, 1001            #takes in 1000 spaces from the user input even though it says 1001 (NULL)
 syscall
 
 move $t0, $a0         #moves the values in the $a0 to $t0 temporary register
@@ -30,6 +30,7 @@ addi $t0, $t0, 1       # iterates the $s0 postion in $a0
 beqz $a0, end_loop    #checks if a 0 is found and if so sends it to end_loop
 beq $a0, 10, end_loop #checks if a character less than 9 is found and if so sends it to end_loop
 beq $a0, 32, if_space #checks if a space is found and if so sends it to if_space loop
+beq $a0, 9, if_tab #checks if a tab is found and if so sends it to if_tab loop
 bne $s3, 1, filter    #if a space if found it goes to the filter loop
 bne $s2, 1 filter     #if a char if found it goes to the filter loop
 
@@ -105,6 +106,8 @@ if_space:		#skips  position if a space is found
 j loop		 	#jumps back to loop
 
 
+if_tab:
+j loop
 
 
 invalid: 	#runs if the character is invalid
@@ -122,6 +125,7 @@ jr $ra
 subprogram:
 
 addi $sp, $sp, -4  #$sp is a stack pointer and -4 makes room in the stack to save nformation in
+sw $s0 ,0($sp)	   #stores the value os $s0 into the 0th placement of the stack pointer (sp)
 jr $ra
 
 
