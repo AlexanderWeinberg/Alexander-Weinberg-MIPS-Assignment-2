@@ -3,7 +3,7 @@
 .data
 user_input: .space 1000	   #makes 1000 spaces for the user input
 endl: .asciiz "\n"	   #makes asciiz character for a new line
-invalid: .asciiz "Invalid input"  #makes asciiz Invalid message
+invalid_msg: .asciiz "Invalid input"  #makes asciiz Invalid message
 
 .text
 
@@ -33,25 +33,25 @@ beq $a0, 32, if_space #checks if a space is found and if so sends it to if_space
 bne $s3, 1, filter    #if a space if found it goes to the filter loop
 bne $s2, 1 filter     #if a char if found it goes to the filter loop
 
-j error		      #jumps to error loop
+j invalid		      #jumps to invalid loop
 
 
 
 filter:			  #loops to filter for valid characters 
 la $s2, 1    		  #iterates the $s2 to know that a char was found
-blt $a0, 48, error	  #checks if ASCII is less than 48. If true it goes to error
+blt $a0, 48, invalid	  #checks if ASCII is less than 48. If true it goes to invalid
 blt $a0, 58, valid_number #checks if ASCII is less than 68. If true it goes to valid_number loop
-blt $a0, 65, error	  #checks if ASCII is less than 48. If true it goes to error
+blt $a0, 65, invalid	  #checks if ASCII is less than 48. If true it goes to invalid
 blt $a0 84, valid_CAP	  #checks if ASCII is less than 68. If true it goes to valid_CAP
-blt $a0 97, error   	  #checks if ASCII is less than 96. If true it goes to error
+blt $a0 97, invalid   	  #checks if ASCII is less than 96. If true it goes to invalid
 blt $a0 116, valid_low    #checks if ASCII is less than 58. If true it goes to valid_low
 
-j error			  #jumps to error loop
+j invalid			  #jumps to invalid loop
 
 
 
 end_loop:
-beqz $s2, error    #if $s2 equals 0 it goes to error
+beqz $s2, invalid    #if $s2 equals 0 it goes to invalid
 
 j final		   # jumps to final loop
 
@@ -107,11 +107,18 @@ j loop		 	#jumps back to loop
 
 
 
-Invalid: 	#runs if the character is invalid
+invalid: 	#runs if the character is invalid
 li $v0, 4        #prints out a string
-la $a0, invalid    #prints the invalid input message
+la $a0, invalid_msg    #prints the invalid input message
 syscall
 
 li $v0, 10    #exits the program
 syscall
+
+#subroutine area
+mov eax, 5
+mov ebx, 3
+call sum
+nop
+j next
 
