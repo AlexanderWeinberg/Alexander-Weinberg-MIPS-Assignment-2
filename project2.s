@@ -13,6 +13,7 @@ main:
 la $s1, 0     #register to keep track of final output
 la $s2, 0     #register to keep track of when a character is found
 la $s3, 0     #register to keep track of spaces
+la $s5, 0     #register to keep  track of vaalid characters before loop stops
 
 li $v0,8 	      # takes in and reads input
 la $a0, user_input    #puts the users input into the $a0 register
@@ -25,15 +26,15 @@ move $t0, $a0         #moves the values in the $a0 to $t0 temporary register
 
 loop:		      #initializs loop and iterates
 
-lb $a0 ($t0)          #load the bit for the $s0 position in $a0
-addi $t0, $t0, 1       # iterates the $s0 postion in $a0
+lb $a0 ($t0)          #load the bit for the $t0 position in $a0
+addi $t0, $t0, 1       # iterates the $t0 postion in $a0
 beqz $a0, end_loop    #checks if a 0 is found and if so sends it to end_loop
 beq $a0, 10, end_loop #checks if a character less than 9 is found and if so sends it to end_loop
 beq $a0, 32, if_space #checks if a space is found and if so sends it to if_space loop
-beq $a0, 9, if_tab #checks if a tab is found and if so sends it to if_tab loop
+beq $a0, 9, if_tab    #checks if a tab is found and if so sends it to if_tab loop
 bne $s3, 1, filter    #if a space if found it goes to the filter loop
-bne $s2, 1 filter     #if a char if found it goes to the filter loop
-
+bne $s2, 1, filter     #if a char if found it goes to the filter loop
+beq $s5, 5, invalid    #if the $s4 register is more than 5 it will jump to the invalid loop
 j invalid		      #jumps to invalid loop
 
 
@@ -76,7 +77,7 @@ syscall
 valid_number:
 subu $s4, $a0, 48  #subtracts to find decimal value of char from ASCII 
 addu $s1, $s1, $s4 #adds the decimal value of the character the final sum
-
+addi $s5, $s5, 1   #increments to keep track that one valid character has been stored
 j loop		   #jumps back to loop
 
 
@@ -85,7 +86,7 @@ j loop		   #jumps back to loop
 valid_CAP:	    #checks for valid capital hexidecimal letters	
 subu $s4, $a0, 55   #subtracts to find decimal value of char from ASCII 
 addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
-
+addi $s5, $s5, 1   #increments to keep track that one valid character has been stored
 j loop		    #jumps back to loop
 
 
@@ -94,15 +95,14 @@ j loop		    #jumps back to loop
 valid_low:	    #checks for valid lower case hexidecimal letter
 subu $s4, $a0, 87   #subtracts to find decimal value of char from ASCII 
 addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
-
+addi $s5, $s5, 1   #increments to keep track that one valid character has been stored
 j loop		    #jumps back to loop
 
 
 
 
 if_space:		#skips  position if a space is found
-#beqz $s2, loop          #if value in $s4 is zero it jumps to loop
-#la $s3, 1 		#marks the $s3 with a value of 1
+ 
 j loop		 	#jumps back to loop
 
 
