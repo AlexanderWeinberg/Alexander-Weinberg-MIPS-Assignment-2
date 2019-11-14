@@ -28,7 +28,7 @@ move $t0, $a0         #moves the values in the $a0 to $t0 temporary register
 
 #lb $a0 ($t0)          #load the bit for the $t0 position in $a0
 #addi $t0, $t0, 1       # iterates the $t0 postion in $a0
-#beqz $a0, end_loop    #checks if a 0 is found and if so sends it to end_loop
+#beqz $a0, end_loop    #checks if the Null character is found and if so sends it to end_loop
 #beq $a0, 10, end_loop #checks if a character less than 9 is found and if so sends it to end_loop
 #beq $a0, 32, if_space #checks if a space is found and if so sends it to if_space loop
 #beq $a0, 9, if_tab    #checks if a tab is found and if so sends it to if_tab loop
@@ -36,8 +36,6 @@ move $t0, $a0         #moves the values in the $a0 to $t0 temporary register
 #bne $s2, 1, filter     #if a char was found it goes to the filter loop
 
 #j invalid		      #jumps to invalid loop
-
-
 
 filter:			  #loops to filter for valid characters 
 
@@ -47,9 +45,21 @@ lb $a0 ($t0)          #load the bit for the $t0 position in $a0
 addi $t0, $t0, 1       # iterates the $t0 postion in $a0
 beq $a0, 32, if_space #checks if a space is found and if so sends it to if_space loop
 beq $a0, 9, if_tab    #checks if a tab is found and if so sends it to if_tab loop
-la $s2, 1    		  #iterates the $s2 to know that a char was found
+beqz $a0, end_loop    #checks if the Null character is found and if so sends it to end_loop
+
+#la $s2, 1    		  #iterates the $s2 to know that a char was found
 blt $a0, 48, invalid	  #checks if ASCII is less than 48. If true it goes to invalid
 blt $a0, 58, valid_number #checks if ASCII is less than 68. If true it goes to valid_number loop
+
+#test display#
+li $v0, 4        #prints out a string
+la $a0, endl    #prints the new line character making it skip a line
+syscall
+move $a0, $s5	#moves the values in $s5 to $a0
+li $v0, 1       #prints out an integer
+syscall
+####
+
 blt $a0, 65, invalid	  #checks if ASCII is less than 48. If true it goes to invalid
 blt $a0, 84, valid_CAP	  #checks if ASCII is less than 68. If true it goes to valid_CAP
 blt $a0, 97, invalid   	  #checks if ASCII is less than 96. If true it goes to invalid
