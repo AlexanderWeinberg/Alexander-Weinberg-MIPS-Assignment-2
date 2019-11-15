@@ -17,6 +17,7 @@ la $s1, 0     #register to keep track of final output set to 0
 la $s2, 0     #register to keep track of when a character is found
 la $s3, 0     #register to keep track of spaces
 la $s5, 0     #register to keep  track of the strings length
+la $t3, 1     #register to keep track of exponent
 
 li $v0,8 	      # takes in and reads input
 la $a0, user_input    #puts the users input into the $a0 register
@@ -24,6 +25,42 @@ li $a1, 1001            #takes in 1000 spaces from the user input even though it
 syscall
 
 move $t0, $a0         #moves the values in the $a0 to $t0 temporary register
+
+jal loop		#jumps to the loop subprogram
+
+
+final:		#runs if the character is valid
+li $v0, 4        #prints out a string
+la $a0, endl    #prints the new line character making it skip a line
+syscall
+
+move $a0, $s1	#moves the values in $s1 to $a0
+li $v0, 1       #prints out an integer
+syscall
+
+li $v0, 10    #exits the program
+syscall
+
+
+
+
+invalid: 	#runs if the character is invalid
+
+li $v0, 4        #prints out a string
+la $a0, endl    #prints the new line character making it skip a line
+syscall
+
+li $v0, 4        #prints out a string
+la $a0, invalid_msg    #prints the invalid input message
+syscall
+
+li $v0, 10    #exits the program
+syscall
+
+
+
+
+
 
 
 loop:		      #initializes loop to find if any character is found and iterates to count entire string
@@ -46,8 +83,8 @@ end_of_loop:		#after the loop runs and gets string length, this loops backwards 
 #beqz $s2, invalid    #if $s2 equals 0 it goes to invalid
 subu $t0, $t0, 1       # iterates the the position of the bit in $t0 to begin reading from the rightmost bit to the left
 lb $a0 ($t0)          #load the bit for the $a0 position in $t0
-beq $a0, 32, end_of_loop #checks if a space is found and if so sends it to if_space loop
-beq $a0, 9, end_of_loop    #checks if a tab is found and if so sends it to if_tab loop
+beq $a0, 32, end_of_loop #checks if a space is found and if so sends back up to end loop
+beq $a0, 9, end_of_loop    #checks if a tab is found and if so sends back up to end loop
 j filter		   # jumps to final loop
 
 
@@ -93,44 +130,11 @@ j filter		   #jumps back to filter
 if_tab:			#skips  position if a tab is found
 j filter		   #jumps back to filter
 
+calcuate:
 
-
-
-invalid: 	#runs if the character is invalid
-
-li $v0, 4        #prints out a string
-la $a0, endl    #prints the new line character making it skip a line
-syscall
-
-li $v0, 4        #prints out a string
-la $a0, invalid_msg    #prints the invalid input message
-syscall
-
-li $v0, 10    #exits the program
-syscall
-
-#subroutine area
-jal subprogram
-
-
-subprogram:
-
- 
 jr $ra
 
 
 
-
-final:		#runs if the character is valid
-li $v0, 4        #prints out a string
-la $a0, endl    #prints the new line character making it skip a line
-syscall
-
-move $a0, $s1	#moves the values in $s1 to $a0
-li $v0, 1       #prints out an integer
-syscall
-
-li $v0, 10    #exits the program
-syscall
 
 
