@@ -26,7 +26,7 @@ syscall
 
 move $t0, $a0         #moves the values in the $a0 to $t0 temporary register
 
-jal loop		#jumps to the loop subprogram
+jal subprogram		#jumps to the subprogram
 
 
 final:		#runs if the character is valid
@@ -60,7 +60,7 @@ syscall
 
 
 
-
+subprogram:
 
 
 loop:		      #initializes loop to find if any character is found and iterates to count entire string
@@ -70,17 +70,9 @@ addi $t5, $t5, 1       # iterates the $s5 register to keep track of the string l
 beqz $a0, end_of_loop    #checks if the Null character is found and if so sends it to end_loop
 j loop
 
-#beq $a0, 10, end_of_loop #checks if a character less than 9 is found and if so sends it to end_loop
-#beq $a0, 32, if_space #checks if a space is found and if so sends it to if_space loop
-#beq $a0, 9, if_tab    #checks if a tab is found and if so sends it to if_tab loop
-#bne $s3, 1, filter    #if a space if found it goes to the filter loop
-#bne $s2, 1, filter     #if a char was found it goes to the filter loop
-
-#j invalid		      #jumps to invalid loop
-
 
 end_of_loop:		#after the loop runs and gets string length, this loops backwards to get the vaild values
-#beqz $s2, invalid    #if $s2 equals 0 it goes to invalid
+
 subu $t0, $t0, 1       # iterates the the position of the bit in $t0 to begin reading from the rightmost bit to the left
 lb $a0 ($t0)          #load the bit for the $a0 position in $t0
 beq $a0, 32, end_of_loop #checks if a space is found and if so sends back up to end loop
@@ -103,7 +95,6 @@ j invalid			  #jumps to invalid  loop
 
 valid_number:
 subu $s4, $a0, 48  #subtracts to find decimal value of char from ASCII 
-#addu $s1, $s1, $s4 #adds the decimal value of the character the final sum
 
 j calculate		   #jump to calculate loop
 
@@ -112,7 +103,6 @@ j calculate		   #jump to calculate loop
 
 valid_CAP:	    #checks for valid capital hexidecimal letters	
 subu $s4, $a0, 55   #subtracts to find decimal value of char from ASCII 
-#addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
 
 j  calculate		   #jump to calculate loop
 
@@ -121,17 +111,12 @@ j  calculate		   #jump to calculate loop
 
 valid_low:	    #checks for valid lower case hexidecimal letters
 subu $s4, $a0, 87   #subtracts to find decimal value of char from ASCII 
-#addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
 
 j  calculate		   #jump to calculate loop
 
 
 
-#if_space:		#skips  position if a space is found
-#j filter		   #jumps back to filter
 
-#if_tab:			#skips  position if a tab is found
-#j filter		   #jumps back to filter
 
 calculate:
 li $t6, 29 		#initializes $t6 as 29 for base 29
@@ -140,7 +125,8 @@ mflo $s4		#saves the lower 4 bits in the $s4 register
 addu $s1, $s1, $s4	#adds the multiplied value to the sum output
 multu $t3, $t6		#multiplies the exponent by base-29 	
 j loop			#jump back to loop
-Exit: jr $ra
+
+Exit: jr $ra		#exits subprogram
 
 
 
