@@ -90,13 +90,14 @@ j filter		   # jumps to final loop
 
 
 filter:			  #loops to filter for valid characters 
-#la $s2, 1    		  #iterates the $s2 to know that a char was found
+beq $s2, 5, Exit	  #exits subprogram once 4 characters have been found
+addi $s2, $s2, 1    	#iterates the $s2 to know that a char was found
 blt $a0, 48, invalid	  #checks if ASCII is less than 48. If true it goes to invalid
-blt $a0, 58, valid_number #checks if ASCII is less than 68. If true it goes to valid_number loop
-blt $a0, 65, invalid	  #checks if ASCII is less than 48. If true it goes to invalid
-blt $a0, 84, valid_CAP	  #checks if ASCII is less than 68. If true it goes to valid_CAP
-blt $a0, 97, invalid   	  #checks if ASCII is less than 96. If true it goes to invalid
-blt $a0, 116, valid_low    #checks if ASCII is less than 58. If true it goes to valid_low
+blt $a0, 58, valid_number #checks if ASCII is less than 58. If true it goes to valid_number loop
+blt $a0, 65, invalid	  #checks if ASCII is less than 65. If true it goes to invalid
+blt $a0, 84, valid_CAP	  #checks if ASCII is less than 84. If true it goes to valid_CAP
+blt $a0, 97, invalid   	  #checks if ASCII is less than 97. If true it goes to invalid
+blt $a0, 116, valid_low    #checks if ASCII is less than 116. If true it goes to valid_low
 
 j invalid			  #jumps to invalid  loop
 
@@ -132,14 +133,14 @@ j  calculate		   #jump to calculate loop
 #if_tab:			#skips  position if a tab is found
 #j filter		   #jumps back to filter
 
-calcuate:
+calculate:
 li $t6, 29 		#initializes $t6 as 29 for base 29
 multu $s4, $t3		#multiplies the decimal value by the exponent value
 mflo $s4		#saves the lower 4 bits in the $s4 register
 addu $s1, $s1, $s4	#adds the multiplied value to the sum output
 multu $t3, $t6		#multiplies the exponent by base-29 	
 j loop			#jump back to loop
-jr $ra
+Exit: jr $ra
 
 
 
