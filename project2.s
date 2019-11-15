@@ -16,7 +16,7 @@ main:
 la $s1, 0     #register to keep track of final output set to 0
 la $s2, 0     #register to keep track of when a character is found
 la $s3, 0     #register to keep track of spaces
-la $s5, 0     #register to keep  track of the strings length
+la $t5, 0     #register to keep  track of the strings length
 la $t3, 1     #register to keep track of exponent
 
 li $v0,8 	      # takes in and reads input
@@ -66,8 +66,8 @@ syscall
 loop:		      #initializes loop to find if any character is found and iterates to count entire string
 lb $a0 ($t0)          #load the bit for the $t0 position in $a0
 addi $t0, $t0, 1       # iterates the $t0 postion in $a0
+addi $t5, $t5, 1       # iterates the $s5 register to keep track of the string length
 beqz $a0, end_of_loop    #checks if the Null character is found and if so sends it to end_loop
-addi $s5, $s5, 1       # iterates the $s5 register to keep track of the string length
 j loop
 
 #beq $a0, 10, end_of_loop #checks if a character less than 9 is found and if so sends it to end_loop
@@ -104,7 +104,7 @@ valid_number:
 subu $s4, $a0, 48  #subtracts to find decimal value of char from ASCII 
 #addu $s1, $s1, $s4 #adds the decimal value of the character the final sum
 
-j filter		   #jumps back to filter
+j calculate		   #jump to calculate loop
 
 
 
@@ -113,7 +113,8 @@ valid_CAP:	    #checks for valid capital hexidecimal letters
 subu $s4, $a0, 55   #subtracts to find decimal value of char from ASCII 
 #addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
 
-j filter		   #jumps back to filter
+j  calculate		   #jump to calculate loop
+
 
 
 
@@ -121,17 +122,22 @@ valid_low:	    #checks for valid lower case hexidecimal letters
 subu $s4, $a0, 87   #subtracts to find decimal value of char from ASCII 
 #addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
 
-j filter		   #jumps back to filter
+j  calculate		   #jump to calculate loop
 
 
-if_space:		#skips  position if a space is found
-j filter		   #jumps back to filter
 
-if_tab:			#skips  position if a tab is found
-j filter		   #jumps back to filter
+#if_space:		#skips  position if a space is found
+#j filter		   #jumps back to filter
+
+#if_tab:			#skips  position if a tab is found
+#j filter		   #jumps back to filter
 
 calcuate:
 
+multu $s4, $t3		#multiplies the decimal value by the exponent value
+mflo $s4		#saves the lower 4 bits in the $s4 register
+addu $s1, $s1, $s4	#adds the multiplied value to the sum output
+#bne $t3, calculate
 jr $ra
 
 
