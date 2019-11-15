@@ -10,10 +10,13 @@ invalid_msg: .asciiz "Invalid input"  #makes asciiz Invalid message
 main:
 
 #saved registers
-la $s1, 0     #register to keep track of final output
+#la $al, user_input
+#li $a0, 0 #register to keep track of final output set to 0
+
+la $s1, 0     #register to keep track of final output set to 0
 la $s2, 0     #register to keep track of when a character is found
 la $s3, 0     #register to keep track of spaces
-la $s5, 0     #register to keep  track of valid characters before loop stops
+la $s5, 0     #register to keep  track of the strings length
 
 li $v0,8 	      # takes in and reads input
 la $a0, user_input    #puts the users input into the $a0 register
@@ -23,10 +26,11 @@ syscall
 move $t0, $a0         #moves the values in the $a0 to $t0 temporary register
 
 
-loop:		      #initializes loop to find if any character is found and iterates
+loop:		      #initializes loop to find if any character is found and iterates to count entire string
 lb $a0 ($t0)          #load the bit for the $t0 position in $a0
 addi $t0, $t0, 1       # iterates the $t0 postion in $a0
 beqz $a0, end_of_loop    #checks if the Null character is found and if so sends it to end_loop
+addi $s5, $s5, 1       # iterates the $s5 register to keep track of the string length
 j loop
 
 #beq $a0, 10, end_of_loop #checks if a character less than 9 is found and if so sends it to end_loop
@@ -38,9 +42,9 @@ j loop
 #j invalid		      #jumps to invalid loop
 
 
-end_of_loop:
+end_of_loop:		#after the loop runs and gets string length, this loops backwards to get the vaild values
 #beqz $s2, invalid    #if $s2 equals 0 it goes to invalid
-subi $t0, $t0, 1       # iterates the the position of the bit in $t0 to begin reading from the rightmost bit to the left
+subu $t0, $t0, 1       # iterates the the position of the bit in $t0 to begin reading from the rightmost bit to the left
 lb $a0 ($t0)          #load the bit for the $a0 position in $t0
 beq $a0, 32, end_of_loop #checks if a space is found and if so sends it to if_space loop
 beq $a0, 9, end_of_loop    #checks if a tab is found and if so sends it to if_tab loop
@@ -49,7 +53,6 @@ j filter		   # jumps to final loop
 
 
 filter:			  #loops to filter for valid characters 
-
 #la $s2, 1    		  #iterates the $s2 to know that a char was found
 blt $a0, 48, invalid	  #checks if ASCII is less than 48. If true it goes to invalid
 blt $a0, 58, valid_number #checks if ASCII is less than 68. If true it goes to valid_number loop
@@ -62,7 +65,7 @@ j invalid			  #jumps to invalid  loop
 
 valid_number:
 subu $s4, $a0, 48  #subtracts to find decimal value of char from ASCII 
-addu $s1, $s1, $s4 #adds the decimal value of the character the final sum
+#addu $s1, $s1, $s4 #adds the decimal value of the character the final sum
 
 j filter		   #jumps back to filter
 
@@ -71,7 +74,7 @@ j filter		   #jumps back to filter
 
 valid_CAP:	    #checks for valid capital hexidecimal letters	
 subu $s4, $a0, 55   #subtracts to find decimal value of char from ASCII 
-addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
+#addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
 
 j filter		   #jumps back to filter
 
@@ -79,7 +82,7 @@ j filter		   #jumps back to filter
 
 valid_low:	    #checks for valid lower case hexidecimal letters
 subu $s4, $a0, 87   #subtracts to find decimal value of char from ASCII 
-addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
+#addu $s1, $s1, $s4  #adds the decimal value of the character the final sum
 
 j filter		   #jumps back to filter
 
@@ -112,8 +115,7 @@ jal subprogram
 
 subprogram:
 
-addi $sp, $sp, -4  #$sp is a stack pointer and -4 makes room in the stack to save nformation in
-sw $s0 ,0($sp)	   #stores the value os $s0 into the 0th placement of the stack pointer (sp)
+ 
 jr $ra
 
 
