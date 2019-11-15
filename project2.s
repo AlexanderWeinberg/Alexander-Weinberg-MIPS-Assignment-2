@@ -133,11 +133,12 @@ j  calculate		   #jump to calculate loop
 #j filter		   #jumps back to filter
 
 calcuate:
-
+li $t6, 29 		#initializes $t6 as 29 for base 29
 multu $s4, $t3		#multiplies the decimal value by the exponent value
 mflo $s4		#saves the lower 4 bits in the $s4 register
 addu $s1, $s1, $s4	#adds the multiplied value to the sum output
-#bne $t3, calculate
+multu $t3, $t6		#multiplies the exponent by base-29 	
+j loop			#jump back to loop
 jr $ra
 
 
